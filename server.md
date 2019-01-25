@@ -1,7 +1,7 @@
 <h1>To run the server locally: </h1>
 
 <ul>
-<li>make sure you have python 3+ and django + django REST framework installed
+<li>make sure you have python 3+ and django + django REST framework installed + django-cors-headers
 <li>download the server folder on your local machine</li>
 <li><code>cd</code> into mlacademy</li>
 <li>run <code>python3 manage.py runserver</code></li> 
