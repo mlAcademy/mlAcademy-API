@@ -8,12 +8,17 @@ from django.utils import timezone
 
 class Lesson(models.Model):
     name = models.CharField(max_length = 100)
-    level = models.CharField(max_length = 20)
+    #level = models.CharField(max_length = 20)
     date_published = models.DateTimeField()
     content = models.TextField()
+    code = models.TextField()
 
     def __str__(self):
         return self.name
+
+class Topic(models.Model):
+    name = models.CharField(max_length = 100)
+    lessons = models.ManyToManyField(Lesson)
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
