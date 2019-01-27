@@ -9,7 +9,7 @@
 
 <h1>To use the REST API</h1>
 
-<p>The public IP of the VM is <s>18.224.107.58</s>. (not deployed yet)</p>
+<p>The public IP of the VM is <b>52.151.66.189</b>.</p>
 
 If you type <code>PUBLICIP/admin</code> you can log into the admin portal and add new lessons to the database.</p>
 <p>To send a <b>GET Request</b> for an existing lesson <code>PUBLICIP/api/&ltLessonID&gt</code> (where LessonID is the unique ID for the lesson) will return a JSON file with the title, author and content. </p>
