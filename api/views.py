@@ -76,6 +76,8 @@ class AllTopicsView(views.APIView):
             "topics_names" : [x.name for x in Topic.objects.all()]
         })
 
+from django.core import serializers
+
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
         serializer = LessonsForTopicInputSerializer(data=request.query_params)
@@ -84,11 +86,14 @@ class AllLessonsForTopic(views.APIView):
         data = serializer.validated_data
         topic_id = data["topic"]
 
-        lessons = [x.name for x in Topic.objects.get(pk=topic_id).lessons.all()]
+        lessons = Topic.objects.get(pk=topic_id).lessons.all()
+        data = serializers.serialize("json", lessons)
+        rendered_lessons = [{"name" : x.name, "published" : x.date_published, "content" : x.content, "code" : x.code} for x in lessons]
 
         return Response({
             "number_of_lessons" : len(lessons),
-            "lessons" : lessons
+            "lessons" : rendered_lessons
+            #"lessons" : lessons
         })
 
 class ComputeView(views.APIView):
