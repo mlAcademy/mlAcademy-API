@@ -1,4 +1,3 @@
-from django.core import serializers
 from rest_framework.response import Response
 import os
 import subprocess
@@ -94,7 +93,7 @@ class AllTopicsView(views.APIView):
 
 
 # from django.core import serializers must be here
-
+from django.core import serializers
 
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
