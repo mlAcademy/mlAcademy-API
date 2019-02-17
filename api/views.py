@@ -1,9 +1,14 @@
+from django.core import serializers
+from rest_framework.response import Response
+import os
+import subprocess
+from rest_framework import serializers, views
 from django.shortcuts import render
-
 from rest_framework import generics
 from lessons.models import Lesson, Topic
 from .serializers import LessonSerializer, TopicSerializer
 # Create your views here.
+
 
 class LessonAPIView(generics.CreateAPIView):
     lookup_field = 'pk'
@@ -12,12 +17,14 @@ class LessonAPIView(generics.CreateAPIView):
     def get_queryset(self):
         return Lesson.objects.all()
 
+
 class LessonRudView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
     serializer_class = LessonSerializer
 
     def get_queryset(self):
         return Lesson.objects.all()
+
 
 class TopicRudView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
@@ -26,11 +33,6 @@ class TopicRudView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Topic.objects.all()
 
-from rest_framework.response import Response
-from rest_framework import serializers, views
-
-import subprocess
-import os
 
 def compute(script):
     with open('INPUT.py', 'w+') as f:
@@ -43,15 +45,19 @@ def compute(script):
 
     return response
 
+
 class ComputeInputSerializer(serializers.Serializer):
     model_input = serializers.CharField()
+
 
 class SearchInputSerializer(serializers.Serializer):
     topic = serializers.IntegerField()
     lesson = serializers.IntegerField()
 
+
 class LessonsForTopicInputSerializer(serializers.Serializer):
     topic = serializers.IntegerField()
+
 
 class SearchView(views.APIView):
     def get(self, request):
@@ -66,17 +72,29 @@ class SearchView(views.APIView):
         lesson = topic.lessons.all()[lesson_id]
 
         return Response({
-            "content" : lesson.content
+            "content": lesson.content
         })
+
 
 class AllTopicsView(views.APIView):
+
     def get(self, request):
+        topics = []
+        for topic in Topic.objects.all():
+            details = {}
+            details["id"] = topic.pk
+            details["name"] = topic.name
+            details["description"] = topic.description
+            details["prerequisites"] = [
+                {'id': x.pk, 'name': x.name} for x in topic.prerequisites.all()]
+            topics.append(details)
         return Response({
-            "topics_ids" : [x.pk for x in Topic.objects.all()],
-            "topics_names" : [x.name for x in Topic.objects.all()]
+            "topics": topics
         })
 
-from django.core import serializers
+
+# from django.core import serializers must be here
+
 
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
@@ -88,13 +106,15 @@ class AllLessonsForTopic(views.APIView):
 
         lessons = Topic.objects.get(pk=topic_id).lessons.all()
         data = serializers.serialize("json", lessons)
-        rendered_lessons = [{"name" : x.name, "published" : x.date_published, "content" : x.content, "code" : x.code} for x in lessons]
+        rendered_lessons = [{"name": x.name, "published": x.date_published,
+                             "content": x.content, "code": x.code} for x in lessons]
 
         return Response({
-            "number_of_lessons" : len(lessons),
-            "lessons" : rendered_lessons
-            #"lessons" : lessons
+            "number_of_lessons": len(lessons),
+            "lessons": rendered_lessons
+            # "lessons" : lessons
         })
+
 
 class ComputeView(views.APIView):
 
