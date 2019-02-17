@@ -6,8 +6,9 @@ from django.utils import timezone
 
 # Create your models here.
 
+
 class Lesson(models.Model):
-    name = models.CharField(max_length = 100)
+    name = models.CharField(max_length=100)
     #level = models.CharField(max_length = 20)
     date_published = models.DateTimeField()
     content = models.TextField()
@@ -16,14 +17,20 @@ class Lesson(models.Model):
     def __str__(self):
         return self.name
 
+
 class Topic(models.Model):
-    name = models.CharField(max_length = 100)
+    name = models.CharField(max_length=100)
     lessons = models.ManyToManyField(Lesson)
+    description = models.TextField(default='lesson description')
+    prerequisites = models.ManyToManyField('self', related_name='prerequisites_rname',
+                                           related_query_name='prerequisites_rqueryname',
+                                           blank=True, symmetrical=False)
+
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_registered = models.DateTimeField()
-    level = models.CharField(default='beginner', max_length = 20)
+    level = models.CharField(default='beginner', max_length=20)
     favourite_lessons = models.ManyToManyField(Lesson)
 
     # def __dict__(self):
