@@ -1,3 +1,4 @@
+from django.core import serializers as coreSerializers
 from rest_framework.response import Response
 import os
 import subprocess
@@ -6,7 +7,6 @@ from django.shortcuts import render
 from rest_framework import generics
 from lessons.models import Lesson, Topic
 from .serializers import LessonSerializer, TopicSerializer
-# Create your views here.
 
 
 class LessonAPIView(generics.CreateAPIView):
@@ -92,9 +92,6 @@ class AllTopicsView(views.APIView):
         })
 
 
-# from django.core import serializers must be here
-from django.core import serializers
-
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
         serializer = LessonsForTopicInputSerializer(data=request.query_params)
@@ -104,7 +101,7 @@ class AllLessonsForTopic(views.APIView):
         topic_id = data["topic"]
 
         lessons = Topic.objects.get(pk=topic_id).lessons.all()
-        data = serializers.serialize("json", lessons)
+        data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
                              "content": x.content, "code": x.code} for x in lessons]
 
