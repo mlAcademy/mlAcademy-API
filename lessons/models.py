@@ -25,6 +25,16 @@ class Topic(models.Model):
     prerequisites = models.ManyToManyField('self', related_name='prerequisites_rname',
                                            related_query_name='prerequisites_rqueryname',
                                            blank=True, symmetrical=False)
+    lesson1 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name='lesson1', null=True, blank=True)
+    lesson2 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson2', null=True, blank=True)
+    lesson3 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson3', null=True, blank=True)
+    lesson4 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson4', null=True, blank=True)
+    lesson5 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson5', null=True, blank=True)
+    lesson6 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson6', null=True, blank=True)
+    lesson7 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson7', null=True, blank=True)
+    lesson8 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson8', null=True, blank=True)
+    lesson9 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson9', null=True, blank=True)
+    lesson10 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson10', null=True, blank=True)
 
 
 class Student(models.Model):
