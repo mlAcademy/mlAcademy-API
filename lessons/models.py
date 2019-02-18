@@ -20,11 +20,13 @@ class Lesson(models.Model):
 
 class Topic(models.Model):
     name = models.CharField(max_length=100)
-    lessons = models.ManyToManyField(Lesson)
     description = models.TextField(default='lesson description')
     prerequisites = models.ManyToManyField('self', related_name='prerequisites_rname',
                                            related_query_name='prerequisites_rqueryname',
                                            blank=True, symmetrical=False)
+    difficulty = models.IntegerField(default = 0)
+    COLOUR_CHOICES = [('1', 'brand'), ('2', 'accent-2'), ('3', 'accent-3'), ('4', 'accent-4')]
+    colour = models.CharField(max_length = 10, choices = COLOUR_CHOICES, default = '1')
     lesson1 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name='lesson1', null=True, blank=True)
     lesson2 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson2', null=True, blank=True)
     lesson3 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson3', null=True, blank=True)
