@@ -100,7 +100,16 @@ class AllLessonsForTopic(views.APIView):
         data = serializer.validated_data
         topic_id = data["topic"]
 
-        lessons = Topic.objects.get(pk=topic_id).lessons.all()
+        #lessons = Topic.objects.get(pk=topic_id).lessons.all()
+        topic = Topic.objects.get(pk=topic_id)
+        lessons = []
+        for i in range(1,11):
+            lesson = getattr(topic, "lesson" + str(i))
+            if lesson == None:
+                break
+            lessons.append(lesson)
+            print("appended "+ str(i))
+
         data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
                              "content": x.content, "code": x.code} for x in lessons]
