@@ -38,31 +38,22 @@ class Topic(models.Model):
     lesson9 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson9', null=True, blank=True)
     lesson10 = models.ForeignKey('Lesson', on_delete=models.SET_NULL, default= None, related_name = 'lesson10', null=True, blank=True)
 
-
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_registered = models.DateTimeField()
-    level = models.CharField(default='beginner', max_length=20)
-    favourite_lessons = models.ManyToManyField(Lesson)
+    uid = models.CharField(max_length=200)
+    completed_lessons = models.ManyToManyField(Lesson, blank=True)
+    completed_topics = models.ManyToManyField(Topic, blank=True)
 
-    # def __dict__(self):
-    #     dict = {}
-    #     dict['name'] = "hello"
-    #     dict['date_registered'] = self.date_registered
-    #     dict['level'] = self.level
-    #     favourite_lessons = m
-
-    def get_favourite_lessons(self):
+    def get_completed_lessons(self):
         return self.favourite_lessons.all()
 
-    def add_favourite_lesson(self, lesson):
+    def add_completed_lesson(self, lesson):
         self.favourite_lessons.add(lesson)
 
-    def remove_favourite_lesson(self, lesson):
+    def remove_completed_lesson(self, lesson):
         self.favourite_lessons.remove(lesson)
 
-    def clear_favourite_lessons(self):
+    def clear_completed_lessons(self):
         self.favourite_lessons.clear()
 
     def __str__(self):
-        return self.user.username
+        return self.uid

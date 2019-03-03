@@ -1,1 +1,1 @@
-asdddd
+print("hey")
