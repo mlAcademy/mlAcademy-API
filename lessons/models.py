@@ -21,6 +21,7 @@ class Lesson(models.Model):
 class Topic(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(default='lesson description')
+    image_url = models.CharField(max_length=300, blank = True)
     prerequisites = models.ManyToManyField('self', related_name='prerequisites_rname',
                                            related_query_name='prerequisites_rqueryname',
                                            blank=True, symmetrical=False)
