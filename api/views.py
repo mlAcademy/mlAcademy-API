@@ -87,6 +87,7 @@ class AllTopicsView(views.APIView):
             details["id"] = topic.pk
             details["name"] = topic.name
             details["description"] = topic.description
+            details["image_url"] = topic.image_url
             details["prerequisites"] = [
                 {'id': x.pk, 'name': x.name} for x in topic.prerequisites.all()]
             topics.append(details)
