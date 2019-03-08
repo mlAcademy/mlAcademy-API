@@ -86,11 +86,15 @@ class AllTopicsView(views.APIView):
             details = {}
             details["id"] = topic.pk
             details["name"] = topic.name
+            details["available"] = topic.available
             details["description"] = topic.description
             details["image_url"] = topic.image_url
+            details["difficulty"] = topic.difficulty
+            details["colour"] = topic.colour
             details["prerequisites"] = [
                 {'id': x.pk, 'name': x.name} for x in topic.prerequisites.all()]
             topics.append(details)
+        topics = sorted(topics, key=lambda x: x["difficulty"])
         return Response({
             "topics": topics
         })
