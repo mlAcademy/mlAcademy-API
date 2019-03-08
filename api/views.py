@@ -94,10 +94,12 @@ class AllTopicsView(views.APIView):
             details["prerequisites"] = [
                 {'id': x.pk, 'name': x.name} for x in topic.prerequisites.all()]
             topics.append(details)
-        topics = sorted(topics, key=lambda x: x["difficulty"])
+        topics = sorted(
+            [topic for topic in topics if topic['available']], key=lambda x: x["difficulty"])
         return Response({
             "topics": topics
         })
+
 
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
@@ -110,12 +112,12 @@ class AllLessonsForTopic(views.APIView):
         #lessons = Topic.objects.get(pk=topic_id).lessons.all()
         topic = Topic.objects.get(pk=topic_id)
         lessons = []
-        for i in range(1,11):
+        for i in range(1, 11):
             lesson = getattr(topic, "lesson" + str(i))
             if lesson == None:
                 break
             lessons.append(lesson)
-            print("appended "+ str(i))
+            print("appended " + str(i))
 
         data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
@@ -127,19 +129,20 @@ class AllLessonsForTopic(views.APIView):
             # "lessons" : lessons
         })
 
+
 class AllStudents(views.APIView):
     def get(self, request):
         if len(request.query_params) == 0:
             return Response({
-                'student_uids' : [x.uid for x in Student.objects.all()]
+                'student_uids': [x.uid for x in Student.objects.all()]
             })
         student_uid = request.query_params['uid']
-        student = Student.objects.get(uid = student_uid)
+        student = Student.objects.get(uid=student_uid)
         print(student, student)
         return Response({
-            'uid' : student_uid,
-            'topics' : [x.pk for x in student.completed_topics.all()],
-            'lessons' : [x.pk for x in student.completed_lessons.all()]
+            'uid': student_uid,
+            'topics': [x.pk for x in student.completed_topics.all()],
+            'lessons': [x.pk for x in student.completed_lessons.all()]
         })
 
     def post(self, request):
@@ -148,70 +151,71 @@ class AllStudents(views.APIView):
         if 'action' not in params:
             return Response({"Please specify the action you want to perform!"})
 
-        #ADD LESSON
+        # ADD LESSON
         if params['action'] == 'add-lesson':
             try:
-                s = Student.objects.get(uid = params['uid'])
-                l = Lesson.objects.get(id = params['lesson-id'])
+                s = Student.objects.get(uid=params['uid'])
+                l = Lesson.objects.get(id=params['lesson-id'])
             except Exception as e:
                 return Response("Invalid lesson or user id!")
             s.completed_lessons.add(l)
             s.save()
             return Response("Added new lesson")
 
-        #ADD TOPIC
+        # ADD TOPIC
         if params['action'] == 'add-topic':
             try:
-                s = Student.objects.get(uid = params['uid'])
-                t = Topic.objects.get(id = params['topic-id'])
+                s = Student.objects.get(uid=params['uid'])
+                t = Topic.objects.get(id=params['topic-id'])
             except Exception as e:
                 return Response("Invalid topic or user id!")
             s.completed_topics.add(t)
             s.save()
             return Response("Added new topic")
 
-        #REMOVE LESSON
+        # REMOVE LESSON
         if params['action'] == 'remove-lesson':
             try:
-                s = Student.objects.get(uid = params['uid'])
-                l = Lesson.objects.get(id = params['lesson-id'])
+                s = Student.objects.get(uid=params['uid'])
+                l = Lesson.objects.get(id=params['lesson-id'])
             except Exception as e:
                 return Response("Invalid lesson or user id!")
             s.completed_lessons.remove(l)
             s.save()
             return Response("Lesson removed")
 
-        #REMOVE TOPIC
+        # REMOVE TOPIC
         if params['action'] == 'remove-topic':
             try:
-                s = Student.objects.get(uid = params['uid'])
-                t = Topic.objects.get(id = params['topic-id'])
+                s = Student.objects.get(uid=params['uid'])
+                t = Topic.objects.get(id=params['topic-id'])
             except Exception as e:
                 return Response("Invalid topic or user id!")
             s.completed_topics.remove(t)
             s.save()
             return Response("Topic removed")
 
-        #CREATE USER
+        # CREATE USER
         if params['action'] == 'create-user':
             if 'uid' not in params:
                 return Response("Include uid to create a new user")
-            if Student.objects.filter(uid = params['uid']):
+            if Student.objects.filter(uid=params['uid']):
                 return Response("User with that uid already exists")
-            s = Student(uid = params['uid'])
+            s = Student(uid=params['uid'])
             s.save()
             return Response("Created new user with id {}!".format(params['uid']))
 
-        #DELETE USER
+        # DELETE USER
         if params['action'] == 'delete-user':
             if 'uid' not in params:
                 return Response("Include uid to delete a user")
             try:
-                s = Student.objects.get(uid = params['uid'])
+                s = Student.objects.get(uid=params['uid'])
             except Exception as e:
                 return Response("User does not exist")
             s.delete()
             return Response("Deleted user with id {}!".format(params['uid']))
+
 
 class StudentAPIView(generics.CreateAPIView):
     lookup_field = 'uid'
@@ -220,12 +224,14 @@ class StudentAPIView(generics.CreateAPIView):
     def get_queryset(self):
         return Student.objects.all()
 
+
 class StudentRudView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
     serializer_class = StudentSerializer
 
     def get_queryset(self):
         return Student.objects.all()
+
 
 class ComputeView(views.APIView):
 
@@ -239,5 +245,5 @@ class ComputeView(views.APIView):
         result = compute(input)
         return Response({
             "output": result[0],
-            "error_output" : result[1]
+            "error_output": result[1]
         })
