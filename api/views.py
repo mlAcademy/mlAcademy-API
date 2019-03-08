@@ -5,8 +5,8 @@ import subprocess
 from rest_framework import serializers, views
 from django.shortcuts import render
 from rest_framework import generics
-from lessons.models import Lesson, Topic
-from .serializers import LessonSerializer, TopicSerializer
+from lessons.models import Lesson, Topic, Student
+from .serializers import LessonSerializer, TopicSerializer, StudentSerializer
 
 
 class LessonAPIView(generics.CreateAPIView):
@@ -37,16 +37,19 @@ def compute(script):
     with open('INPUT.py', 'w+') as f:
         f.write(script)
 
-    os.system("python INPUT.py > OUTPUT.txt")
+    os.system("python INPUT.py > OUTPUT.txt 2>ERROR.txt")
 
     with open("OUTPUT.txt") as f:
-        response = f.read()
+        output = f.read()
 
-    return response
+    with open("ERROR.txt") as f:
+        error = f.read()
+
+    return (output, error)
 
 
 class ComputeInputSerializer(serializers.Serializer):
-    model_input = serializers.CharField()
+    input = serializers.CharField()
 
 
 class SearchInputSerializer(serializers.Serializer):
@@ -84,13 +87,13 @@ class AllTopicsView(views.APIView):
             details["id"] = topic.pk
             details["name"] = topic.name
             details["description"] = topic.description
+            details["image_url"] = topic.image_url
             details["prerequisites"] = [
                 {'id': x.pk, 'name': x.name} for x in topic.prerequisites.all()]
             topics.append(details)
         return Response({
             "topics": topics
         })
-
 
 class AllLessonsForTopic(views.APIView):
     def get(self, request):
@@ -100,7 +103,16 @@ class AllLessonsForTopic(views.APIView):
         data = serializer.validated_data
         topic_id = data["topic"]
 
-        lessons = Topic.objects.get(pk=topic_id).lessons.all()
+        #lessons = Topic.objects.get(pk=topic_id).lessons.all()
+        topic = Topic.objects.get(pk=topic_id)
+        lessons = []
+        for i in range(1,11):
+            lesson = getattr(topic, "lesson" + str(i))
+            if lesson == None:
+                break
+            lessons.append(lesson)
+            print("appended "+ str(i))
+
         data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
                              "content": x.content, "code": x.code} for x in lessons]
@@ -111,6 +123,105 @@ class AllLessonsForTopic(views.APIView):
             # "lessons" : lessons
         })
 
+class AllStudents(views.APIView):
+    def get(self, request):
+        if len(request.query_params) == 0:
+            return Response({
+                'student_uids' : [x.uid for x in Student.objects.all()]
+            })
+        student_uid = request.query_params['uid']
+        student = Student.objects.get(uid = student_uid)
+        print(student, student)
+        return Response({
+            'uid' : student_uid,
+            'topics' : [x.pk for x in student.completed_topics.all()],
+            'lessons' : [x.pk for x in student.completed_lessons.all()]
+        })
+
+    def post(self, request):
+        params = request.query_params
+
+        if 'action' not in params:
+            return Response({"Please specify the action you want to perform!"})
+
+        #ADD LESSON
+        if params['action'] == 'add-lesson':
+            try:
+                s = Student.objects.get(uid = params['uid'])
+                l = Lesson.objects.get(id = params['lesson-id'])
+            except Exception as e:
+                return Response("Invalid lesson or user id!")
+            s.completed_lessons.add(l)
+            s.save()
+            return Response("Added new lesson")
+
+        #ADD TOPIC
+        if params['action'] == 'add-topic':
+            try:
+                s = Student.objects.get(uid = params['uid'])
+                t = Topic.objects.get(id = params['topic-id'])
+            except Exception as e:
+                return Response("Invalid topic or user id!")
+            s.completed_topics.add(t)
+            s.save()
+            return Response("Added new topic")
+
+        #REMOVE LESSON
+        if params['action'] == 'remove-lesson':
+            try:
+                s = Student.objects.get(uid = params['uid'])
+                l = Lesson.objects.get(id = params['lesson-id'])
+            except Exception as e:
+                return Response("Invalid lesson or user id!")
+            s.completed_lessons.remove(l)
+            s.save()
+            return Response("Lesson removed")
+
+        #REMOVE TOPIC
+        if params['action'] == 'remove-topic':
+            try:
+                s = Student.objects.get(uid = params['uid'])
+                t = Topic.objects.get(id = params['topic-id'])
+            except Exception as e:
+                return Response("Invalid topic or user id!")
+            s.completed_topics.remove(t)
+            s.save()
+            return Response("Topic removed")
+
+        #CREATE USER
+        if params['action'] == 'create-user':
+            if 'uid' not in params:
+                return Response("Include uid to create a new user")
+            if Student.objects.filter(uid = params['uid']):
+                return Response("User with that uid already exists")
+            s = Student(uid = params['uid'])
+            s.save()
+            return Response("Created new user with id {}!".format(params['uid']))
+
+        #DELETE USER
+        if params['action'] == 'delete-user':
+            if 'uid' not in params:
+                return Response("Include uid to delete a user")
+            try:
+                s = Student.objects.get(uid = params['uid'])
+            except Exception as e:
+                return Response("User does not exist")
+            s.delete()
+            return Response("Deleted user with id {}!".format(params['uid']))
+
+class StudentAPIView(generics.CreateAPIView):
+    lookup_field = 'uid'
+    serializer_class = StudentSerializer
+
+    def get_queryset(self):
+        return Student.objects.all()
+
+class StudentRudView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'pk'
+    serializer_class = StudentSerializer
+
+    def get_queryset(self):
+        return Student.objects.all()
 
 class ComputeView(views.APIView):
 
@@ -119,9 +230,10 @@ class ComputeView(views.APIView):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        model_input = data["model_input"]
+        input = data["input"]
 
-        result = compute(model_input)
+        result = compute(input)
         return Response({
-            "complex_result": result,
+            "output": result[0],
+            "error_output" : result[1]
         })
