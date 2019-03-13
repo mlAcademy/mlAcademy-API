@@ -11,19 +11,42 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_URL"),
+    integrations=[DjangoIntegration()]
+)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gmlg4=u60+r^hhkfq^29re+j&bjyi=p*+v51wnu-$^20r^%5m0'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG") == "True"
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.1/howto/static-files/
+
+STATIC_URL = os.environ.get("STATIC_URL")
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE") == "True"
+
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE") == "True"
+
+X_FRAME_OPTIONS = os.environ.get("X_FRAME_OPTIONS")
+
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT") == "True"
+SECURE_BROWSER_XSS_FILTER = os.environ.get(
+    "SECURE_BROWSER_XSS_FILTER") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -60,7 +83,7 @@ ROOT_URLCONF = 'mlacademy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,9 +152,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
-STATIC_URL = '/static/'

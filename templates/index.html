@@ -1,0 +1,160 @@
+{% load staticfiles %}
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+	<title>MlAcademy REST API</title>
+	<link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+	<link rel="stylesheet" href="{% static 'github-markdown.css' %}">
+</head>
+
+<body>
+	<article class="markdown-body">
+		<h1>MlAcademy's REST API</h1>
+		<p>Welcome to MlAcademy's API! Below you can find a comlpete documentation of the API.</p>
+
+		<h2>About the API</h2>
+			<p>The API serves two main purposes. One is to make requests to the database and provide easy access to
+			   the website's content. Another is to compute Python scripts per request.
+			</p>
+			<p>To use the API properly, it helps having basic of the database schema in the backend. The content in the website is
+				 structured into three main Django models - <i>Lessons, Topics and Students</i>.
+		  </p>
+			<p>Each <b>Lesson</b> consists of the following fields:
+				<ul>
+					<li><b>id (or primary key)</b> - the object's unique identifier automatically assigned by Django.</li>
+					<li><b>name</b> - the name of the lesson.</li>
+					<li><b>date published</b> - the date and time of the lesson's creation.</li>
+					<li><b>content</b> - the content accompanying the lesson.</li<>
+					<li><b>code</b> - the code filled in the interpreter for the student in advance.</li>
+				</ul>
+			</p>
+			<p>A <b>Topic</b> is a thematic collection of ordered Lessons. It consists of:
+				<ul>
+					<li><b>id</b> - unique identifier.</li>
+					<li><b>name</b> - the name of the topic.</li>
+					<li><b>description</b> - short description to go with the topic's tile.</li>
+					<li><b>image url</b> <i>(optional)</i>- a thumbnail for the topic's tile.</li<>
+					<li><b>prerequisites</b> - a list of Lessons needed to unlock the Topic.</li>
+					<li><b>difficulty</b> - the topic's difficulty level (determines the order in which topic appears in the list of topics).</li>
+					<li><b>colour</b> - field to store the topic's tile's colour.</li>
+					<li><b>Lesson 1 to 10</b> - 10 fields to store the topic's lessons. Order matters as lessons are
+					displayed in the respective order. </li>
+				</ul>
+			</p>
+			<p>Each <b>Student</b> object represents a user. The model is used to store user preferences and progress and has the following fields:
+				<ul>
+					<li><b>id</b> - unique identifier.</li>
+					<li><b>uid</b> <i>(user ID)</i> - a unique identifier provided with user authentication.</li>
+					<li><b>completed lessons</b> - a list of Lessons completed by the Student.</li>
+					<li><b>completed topics</b> -  a list of Topic completed by the Student.</li<>
+				</ul>
+			</p>
+
+			<h2>GET requests </h2>
+
+			<table style="undefined;table-layout: fixed; width: 80em">
+				<colgroup>
+					<col style="width: 15em">
+					<col style="width: 35em">
+					<col style="width: 35em">
+					<col style="width: 15em">
+				</colgroup>
+				<tr>
+					<th>Request</th>
+					<th>Endpoint</th>
+					<th>Description</th>
+					<th>JSON Response Fields</th>
+				</tr>
+				<tr>
+					<td>Get all topics</td>
+					<td><code>api.mlacademy.ml/api/topics</code></td>
+					<td>Get a list of all the website's topics (with all object fields exposed).</td>
+					<td>topics</td>
+				</tr>
+				<tr>
+					<td>Get all lessons per topic</td>
+					<td><code>api.mlacademy.ml/api/lessons/?topic=&lt;TOPIC_ID&gt;</code></td>
+					<td>Returns a list of Lesson objects associated to the topic.</td>
+					<td>number_of_lessons, lessons</td>
+				</tr>
+				<tr>
+					<td>Get lesson by ID</td>
+					<td><code>api.mlacademy.ml/api/students/&lt;LESSON_ID&gt;</code></td>
+					<td>Retrieve a lesson by its absolute ID field.</td>
+					<td>id, name, date_published, content, code</td>
+				</tr>
+				<tr>
+					<td>Get student's details</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;</code></td>
+					<td>Returns the details of the student with user ID &lt;USER_ID&gt;. More specifically,
+						  it returns a list of completed Lesson objects and a lsit of completed Topic objects</td>
+					<td>topics, lessons, uid</td>
+				</tr>
+				<tr>
+					<td>Get computation output</td>
+					<td><code>api.mlacademy.ml/api/compute/?input=print(1)</code></td>
+					<td>The backend server executes the script and returns the output it generates.</td>
+					<td>output, error_output</td>
+				</tr>
+			</table>
+
+			<h2>POST Requests</h2>
+
+			<table style="undefined;table-layout: fixed; width: 80em">
+				<colgroup>
+					<col style="width: 15em">
+					<col style="width: 35em">
+					<col style="width: 35em">
+					<col style="width: 15em">
+				</colgroup>
+				<tr>
+					<th>Request</th>
+					<th>Endpoint</th>
+					<th>Description</th>
+					<th>Required JSON Fields</th>
+				</tr>
+				<tr>
+					<td>Creating a user</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=create-user</code></td>
+					<td>Create a new user with user id USER_ID. UID needs to be unique. </td>
+					<td>action, uid</td>
+				</tr>
+				<tr>
+					<td>Deleting a user</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=delete-user</code></td>
+					<td>Delete user with user id USER_ID. </td>
+					<td>action, uid</td>
+				</tr>
+				<tr>
+					<td>Adding a completed lesson</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=add-lesson&amp;lesson-id=&lt;LESSON_ID&gt;</code></td>
+					<td>Append lesson LESSON_ID to the list of completed lessons of the Student object with id USER_ID.</td>
+					<td>action, uid, lesson-id</td>
+				</tr>
+				<tr>
+					<td>Removing a completed lesson</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=remove-lesson&amp;lesson-id=&lt;LESSON_ID&gt;</code></td>
+					<td>Remove lesson LESSON_ID from the completed lessons list of the student with id USER_ID.</td>
+					<td>action, uid, lesson-id</td>
+				</tr>
+				<tr>
+					<td>Adding a completed topic</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=add-topic&amp;topic-id=&lt;TOPIC_ID&gt;</code></td>
+					<td>Append topic TOPIC_ID to the list of completed topics of the Student object with id USER_ID.</td>
+					<td>action, uid, topic-id</td>
+				</tr>
+				<tr>
+					<td>Removing a topic</td>
+					<td><code>api.mlacademy.ml/api/students/?uid=&lt;USER_ID&gt;&amp;action=remove-topic&amp;topic-id=&lt;TOPIC_ID&gt;</code></td>
+					<td>Remove lesson LESSON_ID from the completed lessons list of the student with id USER_ID. </td>
+					<td>action, uid, topic-id</td>
+				</tr>
+			</table>
+
+
+</body>
+
+</html>
