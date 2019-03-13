@@ -14,10 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path
+from django.http import HttpResponse
+from django.template import Context, loader
+#from views import HomePageView
+from django.shortcuts import render_to_response
+
+
+def welcome_page(request):
+    template = loader.get_template("index.html")
+    return HttpResponse(template.render())
+
 
 urlpatterns = [
     path('api/', include('api.urls')),
     path('query/', include('lessons.urls')),
     path('admin/', admin.site.urls),
-]
+    path('', welcome_page)
+] + static(settings.STATIC_URL,
+           document_root=settings.STATIC_ROOT)
