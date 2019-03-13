@@ -14,33 +14,31 @@ _Ensure you have python3 & **pipenv** installed_
 
 # To use the REST API
 
-You can access the API through api.mlacademy.cf.
+You can access the API through api.mlacademy.ml.
 
-If you type `api.mlacademy.cf/admin` you can log into the admin portal and add new lessons to the database.
+If you type `api.mlacademy.ml/admin` you can log into the admin portal and add new lessons to the database.
 
-To send a **GET Request** for an existing lesson `api.mlacademy.cf/api/<LessonID>` (where LessonID is the unique ID for the lesson) will return a JSON file with the title, author and content.
+To send a **GET Request** for an existing lesson `api.mlacademy.ml/api/<LessonID>` (where LessonID is the unique ID for the lesson) will return a JSON file with the title, author and content.
 
-To send a **POST Request** for a new lesson, the endpoint is `api.mlacademy.cf/api/`
+To send a **POST Request** for a new lesson, the endpoint is `api.mlacademy.ml/api/`
 
-`api.mlacademy.cf/api/compute/?input=print(1)` will return the output of the calculation in a JSON format: `{ "output": "1\n", "error", "" }` Similarly, you can replace print(1) with any script you want to execute as long as you take care of the special characters.
+`api.mlacademy.ml/api/compute/?input=print(1)` will return the output of the calculation in a JSON format: `{ "output": "1\n", "error", "" }` Similarly, you can replace print(1) with any script you want to execute as long as you take care of the special characters.
 
 ## Changes
 
 Lessons are now organized in **Topics** - each topic has a name and a set of Lessons. Topics can be changes from the admin portal just like Lessons. Lesson now has a **code** text field and the difficulty field has been removed.
 
-- `api.mlacademy.cf/api/topics` returns a list of all the available topics (their id-s and their names)
-- To check the lessons in a specific topic, use `api.mlacademy.cf/api/lessons/?topic=<TOPIC_ID>`. This should return the number of lessons in that topic and their names.
-- To retrieve a specific lesson from a specific topic, use `api.mlacademy.cf/api/search/?topic=<TOPIC_ID>&lesson=<LESSON_NUMBER>`. Here <LESSON*NUMBER> is not the lesson id (or primary key) but the number in the topic it belongs to. For example if topic \_Introduction* has topics _Topic 1_, _Topic 2_ and _Topic 3_, those will have lesson numbers 1, 2 and 3, regardless of their id-s in the database.
+- `api.mlacademy.ml/api/topics` returns a list of all the available topics (their id-s and their names)
+- To check the lessons in a specific topic, use `api.mlacademy.ml/api/lessons/?topic=<TOPIC_ID>`. This should return the number of lessons in that topic and their names.
 
 ## Changes 3rd March
 
 ### Student API
 
-The student API can be accessed through `api.mlacademy.cf/api/students`.
+The student API can be accessed through `api.mlacademy.ml/api/students`.
 
 #### GET Requests
 
-- `api/students` - get a list of all students' UID-s.
 - `api/students/uid=USER_ID` - returns `topics` (list of completed topics' ids) and `lessons` (list of completed lessons' ids) for the student with the corresponding UID.
 
 #### POST Requests
