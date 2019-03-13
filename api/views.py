@@ -1,6 +1,7 @@
 from django.core import serializers as coreSerializers
 from rest_framework.response import Response
 import os
+import sys
 import subprocess
 from rest_framework import serializers, views
 from django.shortcuts import render
@@ -34,10 +35,23 @@ class TopicRudView(generics.RetrieveUpdateDestroyAPIView):
 
 
 def compute(script):
+    if ('import os' in script) or ('import sys' in script):
+        return 0
+
     with open('INPUT.py', 'w+') as f:
         f.write(script)
 
-    os.system("python INPUT.py > OUTPUT.txt 2>ERROR.txt")
+    code = -1
+    try:
+        if sys.platform == 'linux':
+            code = os.system("timeout 10 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
+        elif sys.platform == 'darwin':
+            code = os.system("gtimeout 10 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
+    except Exception as e:
+        return 1
+
+    if code == 31744:
+        return 2
 
     with open("OUTPUT.txt") as f:
         output = f.read()
@@ -243,6 +257,18 @@ class ComputeView(views.APIView):
         input = data["input"]
 
         result = compute(input)
+        if result == 0:
+            return Response({
+                "error" : "forbidden_imports"
+            })
+        if result == 1:
+            return Response({
+                "error" : "wrong_environment"
+            })
+        if result == 2:
+            return Response({
+                "error" : "timeout_exceeded"
+            })
         return Response({
             "output": result[0],
             "error_output": result[1]
