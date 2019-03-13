@@ -1,13 +1,16 @@
 # To run the server locally:
 
-_Ensure you have python & **pipenv** installed_
+_Ensure you have python3 & **pipenv** installed_
 
+- `pip --version`
+- `python3 --version`
+- Install pipenv for super user with `sudo -H pip install -U pipenv`
 - `git clone https://github.com/mlacademy/backend.git mlacademy-backend`
 - `cd mlacademy-backend`
 - `pipenv install`
 - `cp .env.example .env` and edit vars for your configuration
 - Local development: `pipenv run python manage.py runserver`
-- Deployment on port 80 `python3 manage.py runserver 0.0.0.0:80`
+- Deployment on port 80 `sudo pipenv run python3 manage.py runserver 0.0.0.0:80`
 
 # To use the REST API
 
