@@ -1,2 +1,1 @@
-while(True):
-  i=1
+# Enter your code below
