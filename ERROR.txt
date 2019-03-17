@@ -4,7 +4,7 @@ Colocations handled automatically by placer.
 WARNING:tensorflow:From /home/team41/.local/share/virtualenvs/production_django-dgvdoE81/lib/python3.5/site-packages/tensorflow/python/keras/layers/core.py:143: calling dropout (from tensorflow.python.ops.nn_ops) with keep_prob is deprecated and will be removed in a future version.
 Instructions for updating:
 Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
-2019-03-17 10:46:53.935290: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2019-03-17 10:46:53.940265: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2294680000 Hz
-2019-03-17 10:46:53.940428: I tensorflow/compiler/xla/service/service.cc:150] XLA service 0x4736ab0 executing computations on platform Host. Devices:
-2019-03-17 10:46:53.940446: I tensorflow/compiler/xla/service/service.cc:158]   StreamExecutor device (0): <undefined>, <undefined>
+2019-03-17 17:28:51.793039: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2019-03-17 17:28:51.798076: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2294680000 Hz
+2019-03-17 17:28:51.798240: I tensorflow/compiler/xla/service/service.cc:150] XLA service 0x3e8cab0 executing computations on platform Host. Devices:
+2019-03-17 17:28:51.798258: I tensorflow/compiler/xla/service/service.cc:158]   StreamExecutor device (0): <undefined>, <undefined>
