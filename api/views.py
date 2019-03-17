@@ -133,7 +133,6 @@ class AllLessonsForTopic(views.APIView):
             if lesson == None:
                 break
             lessons.append(lesson)
-            print("appended " + str(i))
 
         data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
@@ -154,7 +153,6 @@ class AllStudents(views.APIView):
             })
         student_uid = request.query_params['uid']
         student = Student.objects.get(uid=student_uid)
-        print(student, student)
         return Response({
             'uid': student_uid,
             'topics': [x.pk for x in student.completed_topics.all()],
