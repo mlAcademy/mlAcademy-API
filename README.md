@@ -1,4 +1,14 @@
+<p align="center"><a href="https://mlacademy.ml"><img width=60% alt="Logo" src="https://mlacademy.blob.core.windows.net/assets/text_black_large.png"></a></p>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![React](https://img.shields.io/badge/Python-3.6.5-2222dd.svg)
+![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
+[![GitHub Issues](https://img.shields.io/github/issues/mlacademy/mlAcademy-API.svg)](https://github.com/mlacademy/mlAcademy-API/issues)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+[![License](https://img.shields.io/badge/license-GPL-green.svg)](https://www.gnu.org/licenses/gpl.html)
+
 # mlAcademy API
+
 Authored by:
 
 - Samuil Stoychev [@samuil1998](https://github.com/samuil1998)
