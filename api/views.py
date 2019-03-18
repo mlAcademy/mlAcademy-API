@@ -44,9 +44,11 @@ def compute(script):
     code = -1
     try:
         if sys.platform == 'linux':
-            code = os.system("timeout 10 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
+            code = os.system(
+                "timeout 30 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
         elif sys.platform == 'darwin':
-            code = os.system("gtimeout 10 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
+            code = os.system(
+                "gtimeout 30 python INPUT.py > OUTPUT.txt 2>ERROR.txt")
     except Exception as e:
         return 1
 
@@ -131,7 +133,6 @@ class AllLessonsForTopic(views.APIView):
             if lesson == None:
                 break
             lessons.append(lesson)
-            print("appended " + str(i))
 
         data = coreSerializers.serialize("json", lessons)
         rendered_lessons = [{"name": x.name, "published": x.date_published,
@@ -152,7 +153,6 @@ class AllStudents(views.APIView):
             })
         student_uid = request.query_params['uid']
         student = Student.objects.get(uid=student_uid)
-        print(student, student)
         return Response({
             'uid': student_uid,
             'topics': [x.pk for x in student.completed_topics.all()],
@@ -259,15 +259,15 @@ class ComputeView(views.APIView):
         result = compute(input)
         if result == 0:
             return Response({
-                "error" : "forbidden_imports"
+                "error": "forbidden_imports"
             })
         if result == 1:
             return Response({
-                "error" : "wrong_environment"
+                "error": "wrong_environment"
             })
         if result == 2:
             return Response({
-                "error" : "timeout_exceeded"
+                "error": "timeout_exceeded"
             })
         return Response({
             "output": result[0],

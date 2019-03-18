@@ -1,10 +1,29 @@
-# To run the server locally:
+<p align="center"><a href="https://mlacademy.ml"><img width=60% alt="Logo" src="https://mlacademy.blob.core.windows.net/assets/text_black_large.png"></a></p>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![React](https://img.shields.io/badge/Python-3.6.5-2222dd.svg)
+![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
+[![GitHub Issues](https://img.shields.io/github/issues/mlacademy/mlAcademy-API.svg)](https://github.com/mlacademy/mlAcademy-API/issues)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+[![License](https://img.shields.io/badge/license-GPL-green.svg)](https://www.gnu.org/licenses/gpl.html)
+
+# mlAcademy API
+
+Authored by:
+
+- Samuil Stoychev [@samuil1998](https://github.com/samuil1998)
+- Adam Peace [@adamnpeace](https://github.com/adamnpeace)
+- Sotirios Vavaroutas [@svavaroutas](https://github.com/svavaroutas)
+
+# Usage
+
+## To run the server locally:
 
 _Ensure you have python3 & **pipenv** installed_
 
 - `pip --version`
 - `python3 --version`
-- Install pipenv for super user with `sudo -H pip install -U pipenv`
+- **Install pipenv for super user with `sudo -H pip install -U pipenv`**
 - `git clone https://github.com/mlacademy/backend.git mlacademy-backend`
 - `cd mlacademy-backend`
 - `pipenv install`
@@ -12,46 +31,59 @@ _Ensure you have python3 & **pipenv** installed_
 - Local development: `pipenv run python manage.py runserver`
 - Deployment on port 80 `sudo pipenv run python3 manage.py runserver 0.0.0.0:80`
 
-# To use the REST API
+# Consuming the REST API
 
-You can access the API through api.mlacademy.ml.
+## Background
 
-If you type `api.mlacademy.ml/admin` you can log into the admin portal and add new lessons to the database.
+The API serves two main purposes. One is to make requests to the database and provide easy access to the website's content. Another is to compute Python scripts per request.
 
-To send a **GET Request** for an existing lesson `api.mlacademy.ml/api/<LessonID>` (where LessonID is the unique ID for the lesson) will return a JSON file with the title, author and content.
+To use the API properly, it helps having basic of the database schema in the backend. The content in the website is structured into three main Django models - _Lessons, Topics and Students_.
 
-To send a **POST Request** for a new lesson, the endpoint is `api.mlacademy.ml/api/`
+Each **Lesson** consists of the following fields:
 
-`api.mlacademy.ml/api/compute/?input=print(1)` will return the output of the calculation in a JSON format: `{ "output": "1\n", "error", "" }` Similarly, you can replace print(1) with any script you want to execute as long as you take care of the special characters.
+*   **id (or primary key)** - the object's unique identifier automatically assigned by Django.
+*   **name** - the name of the lesson.
+*   **date published** - the date and time of the lesson's creation.
+*   **content** - the content accompanying the lesson.
+*   **code** - the code filled in the interpreter for the student in advance.
 
-## Changes
+A **Topic** is a thematic collection of ordered Lessons. It consists of:
 
-Lessons are now organized in **Topics** - each topic has a name and a set of Lessons. Topics can be changes from the admin portal just like Lessons. Lesson now has a **code** text field and the difficulty field has been removed.
+*   **id** - unique identifier.
+*   **name** - the name of the topic.
+*   **description** - short description to go with the topic's tile.
+*   **image url** _(optional)_\- a thumbnail for the topic's tile.
+*   **prerequisites** - a list of Lessons needed to unlock the Topic.
+*   **difficulty** - the topic's difficulty level (determines the order in which topic appears in the list of topics).
+*   **colour** - field to store the topic's tile's colour.
+*   **Lesson 1 to 10** - 10 fields to store the topic's lessons. Order matters as lessons are displayed in the respective order.
 
-- `api.mlacademy.ml/api/topics` returns a list of all the available topics (their id-s and their names)
-- To check the lessons in a specific topic, use `api.mlacademy.ml/api/lessons/?topic=<TOPIC_ID>`. This should return the number of lessons in that topic and their names.
+Each **Student** object represents a user. The model is used to store user preferences and progress and has the following fields:
 
-## Changes 3rd March
+*   **id** - unique identifier.
+*   **uid** _(user ID)_ - a unique identifier provided with user authentication.
+*   **completed lessons** - a list of Lessons completed by the Student.
+*   **completed topics** - a list of Topic completed by the Student.
 
-### Student API
+## Requests
 
-The student API can be accessed through `api.mlacademy.ml/api/students`.
+### GET Requests
 
-#### GET Requests
+| Request                   | Endpoint                                       | Description                                                                                                                                                       | JSON Response Fields                    |
+|---------------------------|------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|
+| Get all topics            | api.mlacademy.ml/api/topics                    | Get a list of all the website's topics (with all object fields exposed).                                                                                          | topics                                  |
+| Get all lessons per topic | api.mlacademy.ml/api/lessons/?topic=<TOPIC_ID> | Returns a list of Lesson objects associated to the topic.                                                                                                         | number_of_lessons, lessons              |
+| Get lesson by ID          | api.mlacademy.ml/api/students/<LESSON_ID>      | Retrieve a lesson by its absolute ID field.                                                                                                                       | id, name, date_published, content, code |
+| Get student's details     | api.mlacademy.ml/api/students/?uid=<USER_ID>   | Returns the details of the student with user ID <USER_ID>. More specifically, it returns a list of completed Lesson objects and a lsit of completed Topic objects | topics, lessons, uid                    |
+| Get computation output    | api.mlacademy.ml/api/compute/?input=print(1)   | The backend server executes the script and returns the output it generates.                                                                                       | output, error_output                    |
 
-- `api/students/uid=USER_ID` - returns `topics` (list of completed topics' ids) and `lessons` (list of completed lessons' ids) for the student with the corresponding UID.
+### POST Requests
 
-#### POST Requests
-
-Actions are specified by including an `action` parameter.
-
-- **Creating a user** - `api/students/?uid=<NEW_USER_ID>&action=_create-user_`
-- **Deleting a user** - `api/students/?uid=<DELETED_USER_ID>&action=_delete-user_`
-- **Adding a completed lesson** - `api/students/?uid=<USER_ID>&action=_add-lesson_&lesson-id=<LESSON_ID>`
-- **Removing a completed lesson** - `api/students/?uid=<USER_ID>&action=_remove-lesson_&lesson-id=<LESSON_ID>`
-- **Adding a completed topic** - `api/students/?uid=<USER_ID>&action=_add-topic_&topic-id=<TOPIC_ID>`
-- **Removing a topic** - `api/students/?uid=<USER_ID>&action=_remove-topic_&topic-id=<TOPIC_ID>`
-
-### Changes to the computation API
-
-The computation API parameters and url have been changed. To hand a computation task, use `api/compute` (and not the old `api/test`. The GET request parameter's name has been changed from `model_input` to `input`. The API returns an `output` and `error` field now, unlike the old version which only return output as `code_result`.
+| Request                     | Endpoint                                                                                | Description                                                                                     | Required JSON Fields   |
+|-----------------------------|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|------------------------|
+| Creating a user             | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=create-user                         | Create a new user with user id USER_ID. UID needs to be unique.                                 | action, uid            |
+| Deleting a user             | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=delete-user                         | Delete user with user id USER_ID.                                                               | action, uid            |
+| Adding a completed lesson   | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=add-lesson&lesson-id=<LESSON_ID>    | Append lesson LESSON_ID to the list of completed lessons of the Student object with id USER_ID. | action, uid, lesson-id |
+| Removing a completed lesson | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=remove-lesson&lesson-id=<LESSON_ID> | Remove lesson LESSON_ID from the completed lessons list of the student with id USER_ID.         | action, uid, lesson-id |
+| Adding a completed topic    | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=add-topic&topic-id=<TOPIC_ID>       | Append topic TOPIC_ID to the list of completed topics of the Student object with id USER_ID.    | action, uid, topic-id  |
+| Removing a topic            | api.mlacademy.ml/api/students/?uid=<USER_ID>&action=remove-topic&topic-id=<TOPIC_ID>    | Remove lesson LESSON_ID from the completed lessons list of the student with id USER_ID.         | action, uid, topic-id  |
