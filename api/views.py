@@ -151,10 +151,7 @@ class AllStudents(views.APIView):
                 'student_uids': [x.uid for x in Student.objects.all()]
             })
         student_uid = request.query_params['uid']
-        try:
-            student = Student.objects.get(uid=student_uid)
-        except Exception as e:
-            return Response({"error" : "user doesn't exist or duplicate users"})
+        student = Student.objects.get(uid=student_uid)
         print(student, student)
         return Response({
             'uid': student_uid,
