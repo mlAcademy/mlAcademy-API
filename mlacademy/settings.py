@@ -98,14 +98,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mlacademy.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db',
+        'USER': 'team41@mlacademy-mysql',
+        'PORT': '3306',
+        'PASSWORD': 'mlacademy41!',
+        'HOST': 'mlacademy-mysql.mysql.database.azure.com',
+        'OPTIONS': {
+             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+             'charset': 'utf8mb4',
+         }
     }
 }
 
