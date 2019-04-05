@@ -22,6 +22,10 @@ from django.template import Context, loader
 #from views import HomePageView
 from django.shortcuts import render_to_response
 
+admin.site.site_header = 'MlAcademy Admin Portal'
+admin.site.site_title = 'MlAcademy Admin Portal'
+admin.site.index_title = 'MlAcademy Admin Portal'
+admin.site.site_url = 'https://mlacademy.ml'
 
 def welcome_page(request):
     template = loader.get_template("index.html")
